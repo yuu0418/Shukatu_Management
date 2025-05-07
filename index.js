@@ -20,6 +20,12 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../ひなちゃんが作ったディレクトリ名/index.html'));  //ルーティング用のURLにアクセうされたときindex.htmlで返す(reactだから)
   });
 
+// ログを出す共通ミドルウェア
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+  });
+  
 
 //分離構成の場合
 ///ログイン画面での処理(コピペ)データベース構築後変更
