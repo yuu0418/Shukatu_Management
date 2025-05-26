@@ -6,14 +6,15 @@ const PORT = process.env.PORT || 3000;//クラウドで環境変数使われて�
 //トークン発行
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'your_secret_key'; // ※本番では .env に保存！
-//.env読み込み
-require('dotenv').config();
-const { Pool } = require('pg');
+const pool = require('./db');
+const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcrypt');
 
 
 
+app.use(express.json());
 
-app.use(cors());//フロントからAPIさばにアクセスできる
+app.use(cors());//フロント,DBからAPIさばにアクセスできる
 //本番環境では下
 //app.use(cors({
 //    origin: 'https://　　.com'
@@ -26,19 +27,6 @@ app.get('/', (req, res) => {
 
 
 
-
-
-
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'myuser',
-  password: process.env.DB_PASSWORD || 'mypassword',
-  database: process.env.DB_NAME || 'mydb',
-  port: 5432,
-});
-
-module.exports = pool;
-
 // ひなちゃんのフロントとつなげる処理したい
 //app.use(express.static(path.join(__dirname, '../ひなちゃんが作ったディレクトリ名')));  //Reactがビルドした静的ファイルを返す
 
@@ -49,20 +37,37 @@ app.use((req, res, next) => {
   next();
   });
   
+//新規登録
+app.post('/api/register',async(req,res) => {
+  const { email, username, password } = req.body;
+  const id = uuidv4();
+  try{
+      const hashedPassword = await bcrypt.hash('password', 10);
+      await pool.query(
+      'INSERT INTO users (id, email, username, password_hash) VALUES ($1, $2, $3, $4)',
+      [id, email, username, hashedPassword]
+    );
+    res.status(201).json({ message: 'User created' });
+  }catch(err){
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
 
-//分離構成の場合
-///ログイン画面での処理(コピペ)データベース構築後変更
+///ログイン画面
 app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-    // DBで認証確認（省略）
-  if (username === 'user' && password === 'pass') {
-    //仮情報(あとでDBから引っ張る処理を追加)
-    const user = {
-      id: 1,
-      name: '大久保 優',
-      email: '1124iikaraiti@gmail.com',
-      password: '0824'
-    };
+  const { userid, password } = req.body;
+  const hashed = await bcrypt.hash(password, 10);
+  if (userid === 'user' && hashed === 'password_hash') {
+    try{
+      await pool.query(
+      "SELECT * FROM internship WHERE user_id = 'userid'",///////////////////////////////////////ここ考える
+
+      );
+      res.status(201).json({message: '', internship})
+    }catch(err){
+
+    }
     // JWTトークンを発行（有効期限1時間）
     //const token = jwt.sign(user, SECRET_KEY, { expiresIn: '1h' });
     //res.json({ success: true, token,user });
@@ -96,16 +101,11 @@ app.post('/login', (req, res) => {
   //res.json({ message: 'ユーザーデータ', user: req.user });
 //});
 
-
-
-app.use(express.json()); // JSONデータを受け取れるようにする
-
-
-
-
   
 //サーバーきどう
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
+  
+
   
