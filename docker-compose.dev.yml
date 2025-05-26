@@ -9,7 +9,6 @@ services:
       - ./client:/app
       - /app/node_modules
     working_dir: /app
-    command: npm run dev
     environment:
     - WATCHPACK_POLLING=true
     depends_on:
@@ -28,7 +27,7 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
-    command: npm run dev
+    entrypoint: ["/bin/sh", "-c", "./wait-for-it.sh db:5432 -- npm run dev"]
     depends_on:
       - db
 
@@ -41,6 +40,7 @@ services:
       POSTGRES_DB: mydb
     volumes:
       - db-data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
 
