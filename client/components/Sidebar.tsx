@@ -1,5 +1,4 @@
 import {
-  ChevronDown,
   FileText,
   Clock,
   Plus,
@@ -8,14 +7,16 @@ import {
   LayoutGrid,
 } from "lucide-react";
 
-const Sidebar: React.FC = () => {
+const Sidebar = () => {
   return (
     <div className="flex h-full w-60 flex-col border-r border-gray-200 bg-gray-50">
       <div className="flex items-center space-x-2 border-b border-gray-200 px-4 py-3">
         <div className="flex h-6 w-6 items-center justify-center rounded bg-gray-800 text-white">
           S
         </div>
-        <span className="text-sm font-medium text-gray-800">Shukatsu_Manage</span>
+        <span className="text-sm font-medium text-gray-800">
+          shukatsu_kanri
+        </span>
       </div>
 
       <div className="flex-grow overflow-y-auto">

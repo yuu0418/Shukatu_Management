@@ -6,13 +6,11 @@ import {
   Filter,
   SortAsc,
   Search,
-  Plus,
   MoreHorizontal,
 } from "lucide-react";
+import type { ViewType } from "@/types/types";
 
-type ViewType = "table" | "calendar";
-
-const Header: React.FC = () => {
+const Header = () => {
   const [activeView, setActiveView] = useState<ViewType>("table");
 
   const views = [
@@ -64,7 +62,6 @@ const Header: React.FC = () => {
               {view.name}
             </button>
           ))}
-          
         </div>
         <div className="flex items-center space-x-2">
           <div className="relative">
