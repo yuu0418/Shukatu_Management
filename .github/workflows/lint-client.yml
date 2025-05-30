@@ -1,26 +1,42 @@
 name: Run client Lint
 
 on:
-  push:
-    paths:
-      - 'client/**'
+ push:
+   paths:
+     - 'client/**'
 
 jobs:
-  biome:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
+ biome:
+   runs-on: ubuntu-latest
+   steps:
+     - name: Checkout source code
+       uses: actions/checkout@v4
 
-      - name: Setup Biome
-        uses: biomejs/setup-biome@v2
-        with:
-          version: latest
+     - name: Setup Node.js
+       uses: actions/setup-node@v4
+       with:
+         node-version: '20'
+         cache: 'npm'
+         cache-dependency-path: './client/package-lock.json'
 
-      - name: Run Biome on client
-        working-directory: ./client
-        run: biome ci ./src
+     - name: Install dependencies
+       working-directory: ./client
+       run: npm ci
 
-      - name: Run TypeScript check
-        working-directory: ./client
-        run: npm run lint:tsc
+     - name: Setup Biome
+       uses: biomejs/setup-biome@v2
+       with:
+         version: latest
+
+     - name: Run Biome on client
+       working-directory: ./client
+       run: biome ci ./src
+
+     - name: Generate Next.js types
+       working-directory: ./client
+       run: |
+         npx next build --no-lint --dry-run || true
+         
+     - name: Run TypeScript check
+       working-directory: ./client
+       run: npm run lint:tsc
