@@ -1,10 +1,10 @@
 import {
-  FileText,
   Clock,
+  FileText,
+  LayoutGrid,
   Plus,
   Search,
   Settings,
-  LayoutGrid,
 } from "lucide-react";
 
 const Sidebar = () => {

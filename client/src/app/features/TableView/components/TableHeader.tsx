@@ -6,7 +6,7 @@ export const TableHeader = () => (
           <th key={label} className="px-6 py-3">
             <span>{label}</span>
           </th>
-        )
+        ),
       )}
     </tr>
   </thead>

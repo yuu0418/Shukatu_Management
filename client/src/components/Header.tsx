@@ -1,14 +1,14 @@
 "use client";
-import { useState } from "react";
+import type { ViewType } from "@/src/types/types";
 import {
-  LayoutGrid,
   Calendar,
   Filter,
-  SortAsc,
-  Search,
+  LayoutGrid,
   MoreHorizontal,
+  Search,
+  SortAsc,
 } from "lucide-react";
-import type { ViewType } from "@/src/types/types";
+import { useState } from "react";
 
 const Header = () => {
   const [activeView, setActiveView] = useState<ViewType>("table");
