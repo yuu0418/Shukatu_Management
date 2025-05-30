@@ -23,3 +23,6 @@ jobs:
 
       - name: Run Biome
         run: biome ci .
+
+      - name: TypeScript type check (tsc --noEmit)
+        run: npm run lint:tsc
