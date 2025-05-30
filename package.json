@@ -1,0 +1,13 @@
+{
+  "name": "shukatsu_management",
+  "private": true,
+  "workspaces": [
+    "client"
+  ],
+  "scripts": {
+    "client": "pnpm -F \"client\""
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
+  }
+}

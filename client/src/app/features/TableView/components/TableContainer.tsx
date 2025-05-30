@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetTasks } from "@/app/features/TableView/hooks/useGetTasks";
+import { useGetTasks } from "../hooks/useGetTasks";
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
 

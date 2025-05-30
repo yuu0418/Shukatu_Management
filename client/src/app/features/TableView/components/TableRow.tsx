@@ -1,4 +1,4 @@
-import type { Status, Task } from "@/types/types";
+import type { Status, Task } from "@/src/types/types";
 
 const statusColors: Record<Status, string> = {
   通過: "bg-green-100 text-green-800",

@@ -1,4 +1,4 @@
-import type { Task } from "@/types/types";
+import type { Task } from "@/src/types/types";
 import { useEffect, useState } from "react";
 
 export function useGetTasks(): { tasks: Task[] } {

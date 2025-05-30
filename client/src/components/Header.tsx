@@ -8,7 +8,7 @@ import {
   Search,
   MoreHorizontal,
 } from "lucide-react";
-import type { ViewType } from "@/types/types";
+import type { ViewType } from "@/src/types/types";
 
 const Header = () => {
   const [activeView, setActiveView] = useState<ViewType>("table");
