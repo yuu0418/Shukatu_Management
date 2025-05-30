@@ -1,0 +1,15 @@
+client/node_modules
+server/node_modules
+
+client/build
+client/dist
+client/.next
+
+# ログやキャッシュ
+**/npm-debug.log
+**/yarn-error.log
+
+.git
+.gitignore
+README.md
+.DS_Store

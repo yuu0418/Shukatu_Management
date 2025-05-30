@@ -1,0 +1,14 @@
+{
+  "name": "shukatsu_management",
+  "private": true,
+  "workspaces": [
+    "client"
+  ],
+  "scripts": {
+    "lint:client": "npm run lint:biome --workspace=client",
+    "tsc:client": "npm run lint:tsc --workspace=client"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
+  }
+}
