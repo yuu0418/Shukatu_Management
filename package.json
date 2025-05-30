@@ -5,7 +5,8 @@
     "client"
   ],
   "scripts": {
-    "client": "pnpm -F \"client\""
+    "lint:client": "npm run lint:biome --workspace=client",
+    "tsc:client": "npm run lint:tsc --workspace=client"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4"

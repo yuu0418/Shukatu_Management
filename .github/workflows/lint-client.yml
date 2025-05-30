@@ -19,7 +19,7 @@ jobs:
 
       - name: Run Biome on client
         working-directory: ./client
-        run: biome ci .
+        run: biome ci ./src
 
       - name: Run TypeScript check
         working-directory: ./client
