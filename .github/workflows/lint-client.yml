@@ -1,13 +1,9 @@
-name: Run Biome
+name: Run client Lint
 
 on:
-  pull_request:
-    branches:
-      - main
-    types:
-      - opened
-      - synchronize
-  workflow_dispatch:
+  push:
+    paths:
+      - 'client/**'
 
 jobs:
   biome:
@@ -21,5 +17,10 @@ jobs:
         with:
           version: latest
 
-      - name: Run Biome
+      - name: Run Biome on client
+        working-directory: ./client
         run: biome ci .
+
+      - name: Run TypeScript check
+        working-directory: ./client
+        run: npm run lint:tsc

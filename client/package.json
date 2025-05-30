@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:tsc": "tsc --noEmit",
+    "lint:biome": "biome lint ./src"
   },
   "dependencies": {
     "@biomejs/biome": "^1.9.4",
