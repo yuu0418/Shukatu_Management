@@ -14,7 +14,7 @@ type Props = {
   onChangeView: (view: ViewType) => void;
 };
 
-const Header = ({onChangeView}: Props) => {
+const Header = ({ onChangeView }: Props) => {
   const [activeView, setActiveView] = useState<ViewType>("table");
 
   const views = [
