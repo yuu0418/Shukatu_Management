@@ -54,35 +54,48 @@ app.post('/api/register',async(req,res) => {
   }
 });
 
+
 ///ログイン画面
-app.post('/login', (req, res) => {
+app.post('/login', async(req, res) => {
   const { userid, password } = req.body;
-  const hashed = await bcrypt.hash(password, 10);
-  if (userid === 'user' && hashed === 'password_hash') {
-    try{
-      await pool.query(
-      "SELECT * FROM internship WHERE user_id = 'userid'",///////////////////////////////////////ここ考える
+  try{
+    const result = await pool.query(
+      "SELECT password_hash FROM users WHERE id = $1",
+      [userid]
+    );
 
-      );
-      res.status(201).json({message: '', internship})
-    }catch(err){
-
+    if(result.rows.length === 0){
+      return res.status(400).json({success: false, message: 'そのユーザーは登録されていません'});
     }
+
+    const password_hash = result.rows[0].password_hash
+    bcrypt.compare(password,password_hash,async function(err,result){
+      if(err){
+        return res.status(500).json({success: false, message: 'パスワード比較エラー'});
+      }
+      if( result ){
+        try{const internship_data = await pool.query(
+          "SELECT * FROM internship WHERE user_id = $1",
+          [userid]
+          );
+          res.status(200).json({success: true, data: internship_data.rows})
+        }catch(err){
+          res.status(500).json({success: false, message: 'インターン情報取得エラー'});
+        }
+      }else{
+        res.status(401).json({success: false, message: 'パスワードが違います'});
+    }
+    });
+  }catch(err){
+    console.error(err);
+    res.status(500).json({success: false, message: 'サーバーエラー'});
+  }
+  
+});
+
     // JWTトークンを発行（有効期限1時間）
     //const token = jwt.sign(user, SECRET_KEY, { expiresIn: '1h' });
     //res.json({ success: true, token,user });
-
-    //いったんそのまま情報返す
-    res.json({ success: true, user });
-
-  }else if(username === 'user' && password != 'pass'){
-    res.status(401).json({ success: false, message: 'パスワードが違います' });
-  }else {
-    res.status(401).json({ success: false, message: 'そのメールアドレスは登録されていません' });
-  }
-});
-
-
 //トークン認証ミドルウェア(これなにも分かってない)
 //function authenticateToken(req, res, next) {
   //const authHeader = req.headers['authorization'];
