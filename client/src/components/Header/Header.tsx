@@ -10,7 +10,11 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-const Header = () => {
+type Props = {
+  onChangeView: (view: ViewType) => void;
+};
+
+const Header = ({ onChangeView }: Props) => {
   const [activeView, setActiveView] = useState<ViewType>("table");
 
   const views = [
@@ -45,13 +49,18 @@ const Header = () => {
           </div>
         </div>
       </div>
+
       <div className="flex items-center justify-between px-6 py-2">
+        {/* ヘッダー左 */}
         <div className="flex items-center space-x-1">
           {views.map((view) => (
             <button
               type="button"
               key={view.type}
-              onClick={() => setActiveView(view.type)}
+              onClick={() => {
+                setActiveView(view.type);
+                onChangeView(view.type);
+              }}
               className={`flex items-center rounded-md px-3 py-1.5 text-sm ${
                 activeView === view.type
                   ? "bg-gray-100 text-gray-800"
@@ -63,6 +72,8 @@ const Header = () => {
             </button>
           ))}
         </div>
+
+        {/* ヘッダー右 */}
         <div className="flex items-center space-x-2">
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
