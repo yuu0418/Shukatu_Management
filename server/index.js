@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config({ path: '../.env' });
 const cors = require('cors');
 const app =express();
 const path = require('path');
@@ -116,7 +117,7 @@ app.post('/login', async(req, res) => {
 
   
 //サーバーきどう
-app.listen(PORT, () => {
+app.listen(PORT,'0.0.0.0', () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
   
