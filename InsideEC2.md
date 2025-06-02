@@ -11,3 +11,7 @@
 ## github CI/CD
 - mainにpushでデプロイ
 - そのあとpm2をrestart
+
+## pm2
+- clientを3011で起動
+- serverを3012で起動
