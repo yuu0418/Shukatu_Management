@@ -5,7 +5,7 @@ export function useGetTasks(): { tasks: Task[] } {
   const [tasks, setTasks] = useState<Task[]>([]);
   useEffect(() => {
     (async () => {
-      const url = "/tasks.json";
+      const url = `${process.env.NEXT_PUBLIC_API_URL}tasks`;
       const response = await fetch(url);
       const data: Task[] = await response.json();
       setTasks(data);
