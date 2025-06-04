@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: yourdb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  server:
+    build: ./server
+    ports:
+      - "3011:3000"
+    depends_on:
+      - db
+
+  client:
+    build: ./client
+    ports:
+      - "3010:3000"
+    depends_on:
+      - server
+
+volumes:
+  db-data:

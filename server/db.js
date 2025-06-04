@@ -1,12 +1,13 @@
-require("dotenv").config();
+require("dotenv").config({ path: "../.env" });
+console.log("🔍 DB_PASSWORD:", process.env.DB_PASSWORD);
 const { Pool } = require("pg");
 
 const pool = new Pool({
   user: process.env.DB_USER,
-  host: process.env.DB_HOST, // ← ここを環境変数に変更
+  host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT, // 数値にしたい場合は parseInt(process.env.DB_PORT, 10)
+  port: process.env.DB_PORT,
 });
 
 module.exports = pool;

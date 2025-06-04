@@ -10,5 +10,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4"
+  },
+  "dependencies": {
+    "express-session": "^1.18.1"
   }
 }
