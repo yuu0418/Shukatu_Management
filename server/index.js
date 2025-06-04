@@ -2,12 +2,12 @@ const express = require('express');
 require('dotenv').config({ path: '../.env' });
 const cors = require('cors');
 const app =express();
-const path = require('path');
-const PORT = process.env.PORT || 3000;//クラウドで環境変数使われてたらそれ使う
+const PORT = process.env.PORT || 8080;//クラウドで環境変数使われてたらそれ使う
 //トークン発行
-const jwt = require('jsonwebtoken');
-const SECRET_KEY = 'your_secret_key'; // ※本番では .env に保存！
+//const jwt = require('jsonwebtoken');
+//const SECRET_KEY = 'your_secret_key'; // ※本番では .env に保存！
 const pool = require('./db');
+const session = require('express-session');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 
@@ -21,15 +21,19 @@ app.use(cors());//フロント,DBからAPIさばにアクセスできる
 //    origin: 'https://　　.com'
 //  }));
 
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your_session_secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // 開発中はfalse、本番ではtrue＋HTTPS
+}));
+
+
 app.get('/', (req, res) => {
   console.log('GET / accessed');
   res.send('unchi');
 });
 
-
-
-// ひなちゃんのフロントとつなげる処理したい
-//app.use(express.static(path.join(__dirname, '../ひなちゃんが作ったディレクトリ名')));  //Reactがビルドした静的ファイルを返す
 
 
 // ログを出す共通ミドルウェア
@@ -38,12 +42,13 @@ app.use((req, res, next) => {
   next();
   });
   
+
 //新規登録
-app.post('/api/register',async(req,res) => {
+app.post('/api/user/register',async(req,res) => {
   const { email, username, password } = req.body;
   const id = uuidv4();
   try{
-      const hashedPassword = await bcrypt.hash('password', 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
       await pool.query(
       'INSERT INTO users (id, email, username, password_hash) VALUES ($1, $2, $3, $4)',
       [id, email, username, hashedPassword]
@@ -79,6 +84,7 @@ app.post('/login', async(req, res) => {
           "SELECT * FROM internship WHERE user_id = $1",
           [userid]
           );
+          req.session.userid = userid;
           res.status(200).json({success: true, data: internship_data.rows})
         }catch(err){
           res.status(500).json({success: false, message: 'インターン情報取得エラー'});
@@ -94,6 +100,61 @@ app.post('/login', async(req, res) => {
   
 });
 
+
+//インターン企業登録
+app.post('/api/intern/register',async(req,res) => {
+  const { name, status , nextStep , memo , dueDate , tags } = req.body;
+  const id_intern = uuidv4();
+  const user_id = req.session.userid;
+
+  try{
+    await pool.query(
+      'INSERT INTO internships (id, user_id , name, status, nextStep , memo , tags , dueDate ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+      [id_intern, user_id , name, status , nextStep , memo , tags , dueDate ]
+    );
+    res.status(201).json({ message: 'internship created' });
+  }catch(err){
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+
+//インターン企業削除
+app.post('/api/intern/delete',async(req,res) => {
+  const { id_intern } = req.body;
+
+  try{
+    await pool.query(
+      'DELETE FROM internship WHERE id = $1',
+      [id_intern]
+    );
+
+    res.status(201).json({ message: 'internship deleted' });
+  }catch(err){
+    console.error('delete error:', err);
+    res.status(500).json({ error: 'delete error' });
+  }
+});
+
+/*
+//インターン企業修正
+app.post('/api/intern/update',async(req,res) => {
+  const { id_intern , aaa } = req.body;
+
+  try{
+    await pool.query(
+      'UPDATE internship SET $2 = $3 WHERE id = $3',
+      [aaa,aaa,id_intern]
+    );
+
+    res.status(201).json({ message: 'internship deleted' });
+  }catch(err){
+    console.error('delete error:', err);
+    res.status(500).json({ error: 'delete error' });
+  }
+});
+*/
     // JWTトークンを発行（有効期限1時間）
     //const token = jwt.sign(user, SECRET_KEY, { expiresIn: '1h' });
     //res.json({ success: true, token,user });
