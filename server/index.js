@@ -151,13 +151,13 @@ app.post("/login", async (req, res) => {
 //インターン企業登録
 app.post("/api/intern/register", async (req, res) => {
   const { name, status, nextStep, memo, dueDate, tags } = req.body;
-  const id_intern = uuidv4();
+  const intern_id = uuidv4();
   const user_id = req.session.userid;
 
   try {
     await pool.query(
       "INSERT INTO internships (id, user_id , name, status, nextStep , memo , tags , dueDate ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-      [id_intern, user_id, name, status, nextStep, memo, tags, dueDate]
+      [intern_id, user_id, name, status, nextStep, memo, tags, dueDate]
     );
     res.status(201).json({ message: "internship created" });
   } catch (err) {
@@ -168,10 +168,10 @@ app.post("/api/intern/register", async (req, res) => {
 
 //インターン企業削除
 app.post("/api/intern/delete", async (req, res) => {
-  const { id_intern } = req.body;
+  const { intern_id } = req.body;
 
   try {
-    await pool.query("DELETE FROM internship WHERE id = $1", [id_intern]);
+    await pool.query("DELETE FROM internship WHERE id = $1", [intern_id]);
 
     res.status(201).json({ message: "internship deleted" });
   } catch (err) {
@@ -180,40 +180,45 @@ app.post("/api/intern/delete", async (req, res) => {
   }
 });
 
-/*
+
 //インターン企業修正
-app.post('/api/intern/update',async(req,res) => {
-  const { id_intern , aaa } = req.body;
+app.post("/api/intern/update", async (req, res) => {
+  const { intern_id,name, status, nextStep, memo, dueDate, tags } = req.body;
+  const user_id = req.session.userid;
+  if(!user_id && !intern_id && !name ){
+    return res.status(500).json({ error: "userid,internshipid,nameのいずれかに未入力があります" });
+  }
 
-  try{
+  try {
     await pool.query(
-      'UPDATE internship SET $2 = $3 WHERE id = $3',
-      [aaa,aaa,id_intern]
+      "UPDATE internships SET name = $1, status = $2, nextStep = $3, memo = $4, tags = $5, dueDate = $6 updated_at = CURRENT_TIMESTAMP FROM id = $7 AND user_id = $8",
+      [ name, status, nextStep, memo, tags, dueDate, intern_id, user_id]
     );
-
-    res.status(201).json({ message: 'internship deleted' });
-  }catch(err){
-    console.error('delete error:', err);
-    res.status(500).json({ error: 'delete error' });
+    res.status(201).json({ message: "internship updated" });
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Database error" });
   }
 });
+
+/*
+ JWTトークンを発行（有効期限1時間）
+const token = jwt.sign(user, SECRET_KEY, { expiresIn: '1h' });
+res.json({ success: true, token,user });
+トークン認証ミドルウェア(これなにも分かってない)
+function authenticateToken(req, res, next) {
+const authHeader = req.headers['authorization'];
+const token = authHeader && authHeader.split(' ')[1];
+
+if (!token) return res.sendStatus(401); // トークンなし
+
+jwt.verify(token, SECRET_KEY, (err, user) => {
+if (err) return res.sendStatus(403); // トークン無効
+req.user = user;
+next();
+});
+}
 */
-// JWTトークンを発行（有効期限1時間）
-//const token = jwt.sign(user, SECRET_KEY, { expiresIn: '1h' });
-//res.json({ success: true, token,user });
-//トークン認証ミドルウェア(これなにも分かってない)
-//function authenticateToken(req, res, next) {
-//const authHeader = req.headers['authorization'];
-//const token = authHeader && authHeader.split(' ')[1];
-
-//if (!token) return res.sendStatus(401); // トークンなし
-
-//jwt.verify(token, SECRET_KEY, (err, user) => {
-//if (err) return res.sendStatus(403); // トークン無効
-//req.user = user;
-//next();
-//});
-//}
 
 //app.get('/user-info', authenticateToken, (req, res) => {
 //res.json({ message: 'ユーザーデータ', user: req.user });
