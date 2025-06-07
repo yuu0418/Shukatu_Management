@@ -44,7 +44,7 @@ export const SignupForm = () => {
       }
     } catch (e) {
       setError("通信エラーが発生しました");
-        console.error("Error during registration:", e);
+      console.error("Error during registration:", e);
     } finally {
       setIsLoading(false);
     }
