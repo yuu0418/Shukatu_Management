@@ -84,7 +84,7 @@ app.use((req, res, next) => {
 });
 
 //新規登録
-app.post("/api/user/register", async (req, res) => {
+app.post("/register", async (req, res) => {
   const { email, username, password } = req.body;
   const id = uuidv4();
   try {
@@ -102,49 +102,51 @@ app.post("/api/user/register", async (req, res) => {
 
 ///ログイン画面
 app.post("/login", async (req, res) => {
-  const { userid, password } = req.body;
+  const { email, password } = req.body;
+
   try {
     const result = await pool.query(
-      "SELECT password_hash FROM users WHERE id = $1",
-      [userid]
+      "SELECT id, password_hash FROM users WHERE email = $1",
+      [email]
     );
 
     if (result.rows.length === 0) {
-      return res
-        .status(400)
-        .json({ success: false, message: "そのユーザーは登録されていません" });
+      return res.status(400).json({
+        success: false,
+        message: "そのユーザーは登録されていません",
+      });
     }
 
-    const password_hash = result.rows[0].password_hash;
-    // ...existing code...
-    bcrypt.compare(password, password_hash, async (err, result) => {
-      if (err) {
-        return res
-          .status(500)
-          .json({ success: false, message: "パスワード比較エラー" });
-      }
-      if (result) {
-        try {
-          const internship_data = await pool.query(
-            "SELECT * FROM internship WHERE user_id = $1",
-            [userid]
-          );
-          req.session.userid = userid;
-          res.status(200).json({ success: true, data: internship_data.rows });
-        } catch (err) {
-          res
-            .status(500)
-            .json({ success: false, message: "インターン情報取得エラー" });
-        }
-      } else {
-        res
-          .status(401)
-          .json({ success: false, message: "パスワードが違います" });
-      }
-    });
+    const { id: userid, password_hash } = result.rows[0];
+    const match = await bcrypt.compare(password, password_hash);
+
+    if (!match) {
+      return res.status(401).json({
+        success: false,
+        message: "パスワードが違います",
+      });
+    }
+
+    try {
+      const internship_data = await pool.query(
+        "SELECT * FROM internship WHERE user_id = $1",
+        [userid]
+      );
+      req.session.userid = userid;
+      res.status(200).json({ success: true, data: internship_data.rows });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        success: false,
+        message: "インターン情報取得エラー",
+      });
+    }
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "サーバーエラー" });
+    console.error("エラー詳細:", err);
+    res.status(500).json({
+      success: false,
+      message: "サーバーエラー",
+    });
   }
 });
 
