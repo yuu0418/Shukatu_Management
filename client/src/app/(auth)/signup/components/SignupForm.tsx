@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 type RegisterForm = {
-  name: string;
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -29,7 +29,7 @@ export const SignupForm = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: data.name,
+          username: data.username,
           email: data.email,
           password: data.password,
           confirmPassword: data.confirmPassword,
@@ -70,7 +70,7 @@ export const SignupForm = () => {
               type="text"
               id="name"
               placeholder="名前"
-              {...register("name", {
+              {...register("username", {
                 required: "名前は必須です",
                 maxLength: {
                   value: 10,
@@ -80,8 +80,8 @@ export const SignupForm = () => {
               className="w-full border border-gray-300 rounded-[8px] px-3 py-2 placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
               disabled={isLoading}
             />
-            {errors.name && (
-              <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>
+            {errors.username && (
+              <p className="text-xs text-red-500 mt-1">{errors.username.message}</p>
             )}
           </div>
 
