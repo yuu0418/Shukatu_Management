@@ -67,7 +67,7 @@ app.post("/login", async (req, res) => {
 
     try {
       const internship_data = await pool.query(
-        "SELECT * FROM internship WHERE user_id = $1",
+        "SELECT * FROM internships WHERE user_id = $1",
         [user_id]
       );
       req.session.userid = user_id;

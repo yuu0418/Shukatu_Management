@@ -26,7 +26,7 @@ app.post("/delete", async (req, res) => {
   const { intern_id } = req.body;
 
   try {
-    await pool.query("DELETE FROM internship WHERE intern_id = $1", [intern_id]);
+    await pool.query("DELETE FROM internships WHERE intern_id = $1", [intern_id]);
 
     res.status(201).json({ message: "internship infomation deleted" });
   } catch (err) {
