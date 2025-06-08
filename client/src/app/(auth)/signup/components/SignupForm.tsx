@@ -1,9 +1,10 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 type RegisterForm = {
-  name: string;
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -13,10 +14,12 @@ export const SignupForm = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterForm>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
@@ -29,18 +32,18 @@ export const SignupForm = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: data.name,
+          username: data.username,
           email: data.email,
           password: data.password,
-          confirmPassword: data.confirmPassword,
         }),
       });
       const json = await res.json();
 
-      if (!json.success) {
-        setError(json.message || "登録に失敗しました");
+      if (!res.ok || json.error) {
+        setError(json.error || json.message || "登録に失敗しました");
       } else {
-        // 登録成功時の処理（例: リダイレクト）
+        // 登録成功時の処理
+        router.push("/");
       }
     } catch (e) {
       setError("通信エラーが発生しました");
@@ -68,9 +71,9 @@ export const SignupForm = () => {
           <div>
             <input
               type="text"
-              id="name"
+              id="username"
               placeholder="名前"
-              {...register("name", {
+              {...register("username", {
                 required: "名前は必須です",
                 maxLength: {
                   value: 10,
@@ -80,8 +83,10 @@ export const SignupForm = () => {
               className="w-full border border-gray-300 rounded-[8px] px-3 py-2 placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
               disabled={isLoading}
             />
-            {errors.name && (
-              <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>
+            {errors.username && (
+              <p className="text-xs text-red-500 mt-1">
+                {errors.username.message}
+              </p>
             )}
           </div>
 
@@ -112,13 +117,39 @@ export const SignupForm = () => {
               type="password"
               id="password"
               placeholder="パスワード"
-              {...register("password", { required: "パスワードは必須です" })}
+              {...register("password", {
+                required: "パスワードは必須です",
+                minLength: {
+                  value: 6,
+                  message: "パスワードは6文字以上で入力してください",
+                },
+              })}
               className="w-full border border-gray-300 rounded-[8px] px-3 py-2 placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
               disabled={isLoading}
             />
             {errors.password && (
               <p className="text-xs text-red-500 mt-1">
                 {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <input
+              type="password"
+              id="confirmPassword"
+              placeholder="パスワード（確認）"
+              {...register("confirmPassword", {
+                required: "パスワードの確認は必須です",
+                validate: (value) =>
+                  value === watch("password") || "パスワードが一致しません",
+              })}
+              className="w-full border border-gray-300 rounded-[8px] px-3 py-2 placeholder:text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              disabled={isLoading}
+            />
+            {errors.confirmPassword && (
+              <p className="text-xs text-red-500 mt-1">
+                {errors.confirmPassword.message}
               </p>
             )}
           </div>

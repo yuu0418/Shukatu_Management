@@ -17,7 +17,7 @@ app.use(
     secret: process.env.SESSION_SECRET || "your_session_secret",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // 開発中はfalse、本番ではtrue
+    cookie: { secure: true }, // 開発中はfalse、本番ではtrue
   })
 );
 
@@ -48,16 +48,16 @@ app.get("/", (req, res) => {
 
 const tasks = [
   {
-    id: "1",
-    name: "aaa株式会社",
+    intern_id: "1",
+    intern_name: "aaa株式会社",
     status: "結果待ち",
     nextStep: "面接",
     dueDate: "2025-05-10",
     tags: ["フロントエンド", "Webアプリ", "React"],
   },
   {
-    id: "2",
-    name: "bbbbb",
+    intern_id: "2",
+    intern_name: "bbbbb",
     status: "応募予定",
     nextStep: "書類選考",
     dueDate: "2025-05-15",
@@ -73,10 +73,10 @@ app.get("/tasks", (req, res) => {
 app.post("/tasks", (req, res) => {
   try {
     console.log("POST /tasks accessed");
-    const { name, status, nextStep, dueDate, tags } = req.body;
+    const { intern_name, status, nextStep, dueDate, tags } = req.body;
     const newTask = {
-      id: uuidv4(),
-      name,
+      intern_id: uuidv4(),
+      intern_name,
       status,
       nextStep,
       dueDate,
@@ -91,9 +91,15 @@ app.post("/tasks", (req, res) => {
 });
 
 
-
-
 //サーバーきどう
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+  // サーバー起動時にこれを追加してテスト
+  pool.query("SELECT NOW()", (err, res) => {
+    if (err) {
+      console.error("Database connection failed:", err);
+    } else {
+      console.log("Database connected successfully:", res.rows[0]);
+    }
+  });
 });
