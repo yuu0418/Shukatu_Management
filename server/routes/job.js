@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 
 //本選考企業登録
-router.post("/job/register", async (req, res) => {
+router.post("/register", async (req, res) => {
   const { job_name, status, nextStep, memo, dueDate, tags } = req.body;
   const job_id = uuidv4();
   const user_id = req.session.userid;
@@ -22,7 +22,7 @@ router.post("/job/register", async (req, res) => {
 });
 
 //本選考企業削除
-router.post("/job/delete", async (req, res) => {
+router.post("/delete", async (req, res) => {
   const { job_id } = req.body;
   const user_id = req.session.userid;
 
@@ -38,7 +38,7 @@ router.post("/job/delete", async (req, res) => {
 
 
 //本選考企業修正
-router.post("/job/update", async (req, res) => {
+router.post("/update", async (req, res) => {
   const { job_id,job_name, status, nextStep, memo, dueDate, tags } = req.body;
   const user_id = req.session.userid;
   if(!user_id && !job_id && !name ){

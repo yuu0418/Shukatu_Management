@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const router = express.Router();
 
 //インターン企業登録
-router.post("/api/intern/register", async (req, res) => {
+router.post("/register", async (req, res) => {
   const { name, status, nextStep, memo, dueDate, tags } = req.body;
   const intern_id = uuidv4();
   const user_id = req.session.userid;
@@ -22,7 +22,7 @@ router.post("/api/intern/register", async (req, res) => {
 });
 
 //インターン企業削除
-router.post("/api/intern/delete", async (req, res) => {
+router.post("/delete", async (req, res) => {
   const { intern_id } = req.body;
 
   try {
@@ -37,7 +37,7 @@ router.post("/api/intern/delete", async (req, res) => {
 
 
 //インターン企業修正
-router.post("/api/intern/update", async (req, res) => {
+router.post("/update", async (req, res) => {
   const { intern_id,name, status, nextStep, memo, dueDate, tags } = req.body;
   const user_id = req.session.userid;
   if(!user_id && !intern_id && !name ){
