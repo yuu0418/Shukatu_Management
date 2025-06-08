@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -18,6 +19,7 @@ export const SignupForm = () => {
   } = useForm<RegisterForm>();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
@@ -40,8 +42,8 @@ export const SignupForm = () => {
       if (!res.ok || json.error) {
         setError(json.error || json.message || "登録に失敗しました");
       } else {
-        // 登録成功時の処理（例: リダイレクト）
-        alert("登録が完了しました！");
+        // 登録成功時の処理
+        router.push("/");
       }
     } catch (e) {
       setError("通信エラーが発生しました");
