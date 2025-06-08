@@ -1,6 +1,7 @@
-require("dotenv").config({ path: "../.env" });
+const express = require("express");
 console.log("🔍 DB_PASSWORD:", process.env.DB_PASSWORD);
 const { Pool } = require("pg");
+const router = express.Router();
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -20,3 +21,5 @@ module.exports = pool;
     console.error("❌ 接続失敗:", err);
   }
 })();
+
+module.exports = router;
