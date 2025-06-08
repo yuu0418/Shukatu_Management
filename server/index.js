@@ -93,10 +93,25 @@ app.post("/register", async (req, res) => {
       "INSERT INTO users (id, email, username, password_hash) VALUES ($1, $2, $3, $4)",
       [id, email, username, hashedPassword]
     );
-    res.status(201).json({ message: "User created" });
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+    });
   } catch (err) {
     console.error("Database error:", err);
-    res.status(500).json({ error: "Database error" });
+
+
+    if (err.code === "23505") {
+      res.status(400).json({
+        success: false,
+        error: "このメールアドレスは既に登録されています",
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        error: "データベースエラーが発生しました",
+      });
+    }
   }
 });
 
@@ -182,19 +197,20 @@ app.post("/api/intern/delete", async (req, res) => {
   }
 });
 
-
 //インターン企業修正
 app.post("/api/intern/update", async (req, res) => {
-  const { intern_id,name, status, nextStep, memo, dueDate, tags } = req.body;
+  const { intern_id, name, status, nextStep, memo, dueDate, tags } = req.body;
   const user_id = req.session.userid;
-  if(!user_id && !intern_id && !name ){
-    return res.status(500).json({ error: "userid,internshipid,nameのいずれかに未入力があります" });
+  if (!user_id && !intern_id && !name) {
+    return res
+      .status(500)
+      .json({ error: "userid,internshipid,nameのいずれかに未入力があります" });
   }
 
   try {
     await pool.query(
       "UPDATE internships SET name = $1, status = $2, nextStep = $3, memo = $4, tags = $5, dueDate = $6 updated_at = CURRENT_TIMESTAMP FROM id = $7 AND user_id = $8",
-      [ name, status, nextStep, memo, tags, dueDate, intern_id, user_id]
+      [name, status, nextStep, memo, tags, dueDate, intern_id, user_id]
     );
     res.status(201).json({ message: "internship infomation updated" });
   } catch (err) {
@@ -202,7 +218,6 @@ app.post("/api/intern/update", async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
-
 
 //本選考企業登録
 app.post("/api/job/register", async (req, res) => {
@@ -228,7 +243,10 @@ app.post("/api/job/delete", async (req, res) => {
   const user_id = req.session.userid;
 
   try {
-    await pool.query("DELETE FROM jobs WHERE id = $1 AND user_id = $2", [job_id,user_id]);
+    await pool.query("DELETE FROM jobs WHERE id = $1 AND user_id = $2", [
+      job_id,
+      user_id,
+    ]);
 
     res.status(201).json({ message: "job infomation deleted" });
   } catch (err) {
@@ -237,19 +255,20 @@ app.post("/api/job/delete", async (req, res) => {
   }
 });
 
-
 //本選考企業修正
 app.post("/api/job/update", async (req, res) => {
-  const { job_id,name, status, nextStep, memo, dueDate, tags } = req.body;
+  const { job_id, name, status, nextStep, memo, dueDate, tags } = req.body;
   const user_id = req.session.userid;
-  if(!user_id && !job_id && !name ){
-    return res.status(500).json({ error: "userid,jobid,nameのいずれかに未入力があります" });
+  if (!user_id && !job_id && !name) {
+    return res
+      .status(500)
+      .json({ error: "userid,jobid,nameのいずれかに未入力があります" });
   }
 
   try {
     await pool.query(
       "UPDATE jobs SET name = $1, status = $2, nextStep = $3, memo = $4, tags = $5, dueDate = $6 updated_at = CURRENT_TIMESTAMP FROM id = $7 AND user_id = $8",
-      [ name, status, nextStep, memo, tags, dueDate, job_id, user_id]
+      [name, status, nextStep, memo, tags, dueDate, job_id, user_id]
     );
     res.status(201).json({ message: "job infomation updated" });
   } catch (err) {
@@ -284,4 +303,12 @@ next();
 //サーバーきどう
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+  // サーバー起動時にこれを追加してテスト
+  pool.query("SELECT NOW()", (err, res) => {
+    if (err) {
+      console.error("Database connection failed:", err);
+    } else {
+      console.log("Database connected successfully:", res.rows[0]);
+    }
+  });
 });
